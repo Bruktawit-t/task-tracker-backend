@@ -31,7 +31,10 @@ exports.createTask = async (req, res, next) => {
 exports.updateTask = async (req, res, next) => {
   try {
     const updated = await Task.updateTask(req.params.id, req.body);
-    res.json(updated);
+    if (updated.affectedRows === 0) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+    res.json({ message: 'Task updated successfully' });
   } catch (err) {
     next(err);
   }
@@ -39,7 +42,10 @@ exports.updateTask = async (req, res, next) => {
 
 exports.deleteTask = async (req, res, next) => {
   try {
-    await Task.deleteTask(req.params.id);
+    const result = await Task.deleteTask(req.params.id);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
     res.status(204).end();
   } catch (err) {
     next(err);
