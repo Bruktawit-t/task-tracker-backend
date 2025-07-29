@@ -1,67 +1,55 @@
-const db = require('../config/db'); // Your MySQL2 connection
+import db from '../config/db.js';
 
-// Get all tasks
-function getAllTasks() {
-  return new Promise((resolve, reject) => {
-    db.query('SELECT * FROM tasks ORDER BY dueDate ASC', (err, results) => {
-      if (err) return reject(err);
-      resolve(results);
+const Task = {
+  getAllTasks: () => {
+    return new Promise((resolve, reject) => {
+      db.query('SELECT * FROM tasks', (err, results) => {
+        if (err) return reject(err);
+        resolve(results);
+      });
     });
-  });
-}
+  },
 
-// Get task by ID
-function getTaskById(id) {
-  return new Promise((resolve, reject) => {
-    db.query('SELECT * FROM tasks WHERE id = ?', [id], (err, results) => {
-      if (err) return reject(err);
-      resolve(results[0]);
+  getTaskById: (id) => {
+    return new Promise((resolve, reject) => {
+      db.query('SELECT * FROM tasks WHERE id = ?', [id], (err, results) => {
+        if (err) return reject(err);
+        resolve(results[0]);
+      });
     });
-  });
-}
+  },
 
-// Create new task
-function createTask(task) {
-  return new Promise((resolve, reject) => {
-    const { title, description = '', dueDate = null, completed = 0 } = task;
-    const query = 'INSERT INTO tasks (title, description, dueDate, completed) VALUES (?, ?, ?, ?)';
-    const values = [title, description, dueDate, completed];
-
-    db.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve({ id: result.insertId, ...task });
+  createTask: (taskData) => {
+    const { title, description, due_date, completed } = taskData;
+    return new Promise((resolve, reject) => {
+      db.query(
+        'INSERT INTO tasks (title, description, due_date, completed) VALUES (?, ?, ?, ?)',
+        [title, description, due_date, completed],
+        (err, result) => {
+          if (err) return reject(err);
+          resolve({ id: result.insertId, ...taskData });
+        }
+      );
     });
-  });
-}
+  },
 
-// Update existing task by ID
-function updateTask(id, task) {
-  return new Promise((resolve, reject) => {
-    const { title, description = '', dueDate = null, completed = 0 } = task;
-    const query = 'UPDATE tasks SET title = ?, description = ?, dueDate = ?, completed = ? WHERE id = ?';
-    const values = [title, description, dueDate, completed, id];
-
-    db.query(query, values, (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
+  updateTask: (id, updatedData) => {
+    return new Promise((resolve, reject) => {
+      db.query('UPDATE tasks SET ? WHERE id = ?', [updatedData, id], (err) => {
+        if (err) return reject(err);
+        resolve({ id, ...updatedData });
+      });
     });
-  });
-}
+  },
 
-// Delete task by ID
-function deleteTask(id) {
-  return new Promise((resolve, reject) => {
-    db.query('DELETE FROM tasks WHERE id = ?', [id], (err, result) => {
-      if (err) return reject(err);
-      resolve(result);
+  deleteTask: (id) => {
+    return new Promise((resolve, reject) => {
+      db.query('DELETE FROM tasks WHERE id = ?', [id], (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
     });
-  });
-}
-
-module.exports = {
-  getAllTasks,
-  getTaskById,
-  createTask,
-  updateTask,
-  deleteTask,
+  }
 };
+
+export default Task;
