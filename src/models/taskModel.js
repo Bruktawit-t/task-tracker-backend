@@ -1,55 +1,41 @@
 import db from '../config/db.js';
 
-const Task = {
-  getAllTasks: () => {
-    return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM tasks', (err, results) => {
-        if (err) return reject(err);
-        resolve(results);
-      });
-    });
-  },
-
-  getTaskById: (id) => {
-    return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM tasks WHERE id = ?', [id], (err, results) => {
-        if (err) return reject(err);
-        resolve(results[0]);
-      });
-    });
-  },
-
-  createTask: (taskData) => {
-    const { title, description, due_date, completed } = taskData;
-    return new Promise((resolve, reject) => {
-      db.query(
-        'INSERT INTO tasks (title, description, due_date, completed) VALUES (?, ?, ?, ?)',
-        [title, description, due_date, completed],
-        (err, result) => {
-          if (err) return reject(err);
-          resolve({ id: result.insertId, ...taskData });
-        }
-      );
-    });
-  },
-
-  updateTask: (id, updatedData) => {
-    return new Promise((resolve, reject) => {
-      db.query('UPDATE tasks SET ? WHERE id = ?', [updatedData, id], (err) => {
-        if (err) return reject(err);
-        resolve({ id, ...updatedData });
-      });
-    });
-  },
-
-  deleteTask: (id) => {
-    return new Promise((resolve, reject) => {
-      db.query('DELETE FROM tasks WHERE id = ?', [id], (err, result) => {
-        if (err) return reject(err);
-        resolve(result);
-      });
-    });
-  }
+const getAllTasks = async () => {
+  const [rows] = await db.query('SELECT * FROM tasks ORDER BY created_at DESC');
+  return rows;
 };
 
-export default Task;
+const getTaskById = async (id) => {
+  const [rows] = await db.query('SELECT * FROM tasks WHERE id = ?', [id]);
+  return rows[0];
+};
+
+const createTask = async (taskData) => {
+  const { title, description, due_date, completed } = taskData;
+  const [result] = await db.query(
+    'INSERT INTO tasks (title, description, due_date, completed) VALUES (?, ?, ?, ?)',
+    [title, description, due_date, completed ?? false]
+  );
+  return { id: result.insertId, ...taskData };
+};
+
+const updateTask = async (id, updatedData) => {
+  const { title, description, due_date, completed } = updatedData;
+  await db.query(
+    'UPDATE tasks SET title = ?, description = ?, due_date = ?, completed = ? WHERE id = ?',
+    [title, description, due_date, completed, id]
+  );
+  return { id, ...updatedData };
+};
+
+const deleteTask = async (id) => {
+  await db.query('DELETE FROM tasks WHERE id = ?', [id]);
+};
+
+export default {
+  getAllTasks,
+  getTaskById,
+  createTask,
+  updateTask,
+  deleteTask
+};
