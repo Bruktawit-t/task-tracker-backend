@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import taskRoutes from './src/routes/taskRoutes.js';
 import errorHandler from './src/middlewares/errorMiddleware.js';
 
+console.log('DB_USER:', process.env.DB_USER); // <-- Debugging line
 dotenv.config();
 
 const app = express();
