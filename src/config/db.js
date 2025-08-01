@@ -12,7 +12,10 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  ssl: false // Set false for FreeMySQLDatabase.com
+  ssl: {
+    rejectUnauthorized: true
+  }
+   // Set false for FreeMySQLDatabase.com
 });
 
 export default pool;
