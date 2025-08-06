@@ -24,6 +24,10 @@ app.use('/api/tasks', taskRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+app.get('/', (req, res) => {
+  res.send('Hello! Server is running.');
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

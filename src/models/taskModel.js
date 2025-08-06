@@ -1,5 +1,7 @@
 import db from '../config/db.js';
 
+
+
 const getAllTasks = async () => {
   const [rows] = await db.query('SELECT * FROM tasks ORDER BY created_at DESC');
   return rows;

@@ -11,8 +11,7 @@ const pool = mysql.createPool({
   port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0,
-  ssl: false // Use false if FreeSQLDatabase doesn't support SSL
+  queueLimit: 0// Use false if FreeSQLDatabase doesn't support SSL
 });
 
 export default pool;
