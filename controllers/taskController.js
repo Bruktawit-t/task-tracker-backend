@@ -34,9 +34,9 @@ export const editTask = async (req, res) => {
     const userId = req.user.userId;
     const { id } = req.params;
     const task = req.body;
-    const updated = await updateTask(id, userId, task);
-    if (updated) {
-      res.json({ message: 'Task updated' });
+    const updatedTask = await updateTask(id, userId, task);
+    if (updatedTask) {
+      res.json(updatedTask); // Return the updated task object
     } else {
       res.status(404).json({ message: 'Task not found or not authorized' });
     }
