@@ -18,7 +18,7 @@ export const registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userId = await createUser({ name, email, password: hashedPassword });
+    const userId = await createUser({ username, email, password: hashedPassword });
     const token = generateToken(userId);
 
     res.status(201).json({ token });
