@@ -9,9 +9,15 @@ const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
+// --------------------- REGISTER ---------------------
 export const registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
       return res.status(400).json({ message: 'Email already registered' });
@@ -23,14 +29,20 @@ export const registerUser = async (req, res) => {
 
     res.status(201).json({ token });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Failed to register user' });
+    console.error('Registration error:', error); 
+    res.status(500).json({ message: 'Registration failed', error: error.message });
   }
 };
 
+// --------------------- LOGIN ---------------------
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     const user = await getUserByEmail(email);
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -42,9 +54,9 @@ export const loginUser = async (req, res) => {
     }
 
     const token = generateToken(user.id);
-    res.json({ token });
+    res.status(200).json({ token });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Failed to login' });
+    res.status(500).json({ message: 'Login failed', error: error.message });
   }
 };
